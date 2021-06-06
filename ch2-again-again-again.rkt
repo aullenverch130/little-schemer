@@ -67,3 +67,32 @@
 (or '(d s) 'c) ;=> (d s)
 (or #f 'a) ;=> a
 ;; ^^ returns 2nd because 1st arg is #f
+
+
+;; trying to write the opposite of the member? func
+(define nonmember?
+  (lambda (a lat)
+    (cond
+      ((null? lat) #t)
+      ((not (eq? (car lat) a)) 
+       (nonmember? a (cdr lat))) 
+      (else #f))))
+(nonmember? 'f '(a b c)) ;=> #t   
+(nonmember? 'a '(a b c)) ;=> #f
+
+
+;; ??? trying a 'contains' func
+; (define contains? 
+;   (lambda (a lat)
+;     (cond 
+;       ;; check if the end..
+;       ((null? lat) #f)
+;       ;; check if we should recur a again??
+;       ((eq? (car a) (car lat)) 
+;               (contains? (cdr a) (cdr lat)))
+;       ;; recur lat again
+;       (else (contains? a (cdr lat)))
+;     )))
+;; ^^ how do we "iterate" through all of the 
+;; s-exp of a to determine if a is in lat??
+;; ^^ how do I pass data through the recurrences??
