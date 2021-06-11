@@ -1,11 +1,9 @@
 #lang racket
 
-;; used for lat func
 (define atom? 
   (lambda (x) 
     (and (not (pair? x)) (not (null? x)))))
 ;; (define car? (lambda (x) ()))
-
 
 
 ;; again when should we quote??
@@ -68,7 +66,6 @@
 (or #f 'a) ;=> a
 ;; ^^ returns 2nd because 1st arg is #f
 
-
 ;; trying to write the opposite of the member? func
 (define nonmember?
   (lambda (a lat)
@@ -81,18 +78,27 @@
 (nonmember? 'a '(a b c)) ;=> #f
 
 
+;; TODO: finish contains func!!
 ;; ??? trying a 'contains' func
-; (define contains? 
-;   (lambda (a lat)
-;     (cond 
-;       ;; check if the end..
-;       ((null? lat) #f)
-;       ;; check if we should recur a again??
-;       ((eq? (car a) (car lat)) 
-;               (contains? (cdr a) (cdr lat)))
-;       ;; recur lat again
-;       (else (contains? a (cdr lat)))
-;     )))
+(define contains? 
+  (lambda (a lat)
+    (cond 
+      ;; check if the end..
+      ((null? lat) #f)
+      ((null? a) #t)
+
+      ;; check if we should recur a again??
+      ((eq? (car a) (car lat)) 
+              (contains? (cdr a) (cdr lat)))
+        
+      ;; recur lat again
+      (else (contains? a (cdr lat)))
+    )))
 ;; ^^ how do we "iterate" through all of the 
 ;; s-exp of a to determine if a is in lat??
 ;; ^^ how do I pass data through the recurrences??
+
+((lambda (x) (car x)) '(d f g)) ;=> d
+;; ^^ what's after a lambda will be applied to it!!
+
+
