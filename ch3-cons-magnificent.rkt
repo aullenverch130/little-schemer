@@ -49,8 +49,21 @@
 ;; if (______, _______), or (______, ______), (______, ______), 
 ;;    (______, then ______),  else (______, _______)
 ;; ^^ commas, and comma types could all be implied as default.. 
+;; read : as "is" or "as" associate.. 
 
+;; #rember-simp is func of a & lat: 
+;;      if lat is empty, empty
+;;      or if 1st of lat equals a, 
+;;              #rember-simp of (rest of lat) & a
+;;      else 1st of lat,
+;;            with #rember-simp of (rest of lat) & a
 
+;; #rember-simp is func of a & lat: 
+;;      if lat is empty, is empty
+;;      or if 1st of lat equals a, 
+;;              is #rember-simp of (rest of lat) & a
+;;      or else is 1st of lat,
+;;            with #rember-simp of (rest of lat) & a
 
 ;; this is to test for writing "firsts" func
 ;; it converts '(a b) to (cons a (cons b '())) then evals
@@ -73,3 +86,12 @@
           (bean carrot eggplant))) ;=> (apple plum grape bean)
 
 ;; TODO: write 2nds func!
+
+
+;; category theory idea
+;;
+;; empty list = initial obj
+;; cons = coproduct
+;;
+;; ??? = terminal obj
+;; list = product ??
