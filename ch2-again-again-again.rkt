@@ -78,8 +78,8 @@
 (nonmember? 'a '(a b c)) ;=> #f
 
 
-;; TODO: finish contains func!!
-;; ??? trying a 'contains' func
+
+;; trying a 'contains' func
 (define contains? 
   (lambda (a lat)
     (cond 
@@ -92,7 +92,7 @@
               (contains? (cdr a) (cdr lat)))
         
       ;; recur lat again
-      (else (contains? a (cdr lat)))
+      (else (cons car lat (contains? a (cdr lat))))
     )))
 ;; ^^ how do we "iterate" through all of the 
 ;; s-exp of a to determine if a is in lat??
@@ -100,5 +100,29 @@
 
 ((lambda (x) (car x)) '(d f g)) ;=> d
 ;; ^^ what's after a lambda will be applied to it!!
+
+;; finished contains func
+(define ordered-contains? 
+  (lambda (a lat)
+    (cond 
+      ;; check if the end..
+      ((and (null? lat) (null? a)) #t)
+      ((null? a) #t)
+      ((null? lat) #f)
+  
+      ;; check if we should recur a again??
+      ((eq? (car a) (car lat)) 
+            (contains? (cdr a) (cdr lat)))
+        
+      ;; recur lat again
+      (else (contains? a (cdr lat)))
+    )))
+(contains? '(a c) '(a b c)) ;=> #t   
+(contains? '(c a) '(a b c)) ;=> #f   
+(contains? '(b c) '(a b c)) ;=> #t
+(contains? '(a c c d) '(d f a c j k c l d)) ;=> #t
+;; this contains func checks ordered contains..
+;; so as long as the s-exp a appears in that order in lat then it is #t
+
 
 

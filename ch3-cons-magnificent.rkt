@@ -33,8 +33,7 @@
       (else (cons (car lat)
               (rember-simp a (cdr lat)))))))
 ;; ^^ func structure doesn't match arg structure??
-;; TODO: if 1st of lat & a equal true, 
-;;              call #rember-simp with rest of lat & a
+
 ;; define #rember-simp as function of a & lat:
 ;;
 ;; #rember-simp is func of a & lat: <- could imply "&" w/ ","
@@ -212,3 +211,5 @@
 (multisubst 'fried 'fish '(chips and fish or fish and fried))
 ;=> (chips and fried or fried and fried)
 
+
+;; TODO: write multicontains!!
