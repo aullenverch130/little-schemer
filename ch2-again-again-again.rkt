@@ -107,6 +107,7 @@
     (cond 
       ;; check if the end..
       ((and (null? lat) (null? a)) #t)
+      ;; or ((eq? lat a) #t)
       ((null? a) #t)
       ((null? lat) #f)
   
