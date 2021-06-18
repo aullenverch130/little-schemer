@@ -125,6 +125,11 @@
                     (tupplus (cdr tup1) (cdr tup2)))))))
 
 
+
+
+
+
+
 (define map 
     '((o o o o o)
       (o o o o o)
@@ -149,6 +154,18 @@
                 (display (car x)) 
                 (displaylist (cdr x))))))
 ;; ^^ could use this to display lists for a "rouge like"
+
+(display "Please enter your name: ")
+(define name (read))
+(display "Hello, ")
+(display name)
+(newline)
+;; ex: on how to get input!!
+
+
+
+
+
 
 
 ;; tupplus
@@ -277,3 +294,39 @@
             ((or (number? a1) (number? a2)) #f)
             (else (eq? a1 a2)))))
 ;; I didn't do this func, nor did I get the point?
+
+;; my try @ occur
+(define occur?
+    (lambda (a lat)
+        (cond
+            ((null? lat) 0)
+            ((eq? a (car lat)) (add1 (occur? a (cdr lat))))
+            (else (occur? a (cdr lat))))))
+(occur? 'a '(a a a b a c a d e)) ;=> 5
+
+;; my try at one? func
+(define one?
+    (lambda (n)
+        (cond
+            ((and (my> n 0) (my< n 2)) #t)
+            (else #f))))
+;; my try @ a simplified version..
+(define one?? (lambda (n) (my= n 1)))
+
+;; rewriting rempick w/ one??
+(define rempick2
+    (lambda (n lat)
+        (cond
+            ((null? lat) '())
+            ((one?? n) (cdr lat))
+            (else (cons (car lat) 
+                    (rempick2 (sub1 n) (cdr lat)))))))
+(rempick2 2 '(a b c d)) ;=> '(a c d)
+
+;; TODO: use cons to create a tree
+;; maybe take a tup and output (# "# of times it occurs")
+;; (1 3 1 2 1 1 3) => ((1 4) (2 1) (3 2))
+;; (1 3 1 (3 3 3 2 2 1) 2 1 1 3) => ( (1 4) (2 1) (3 2) 
+;;                                   ((1 1) (2 2) (3 3)) )
+;; ^^ maybe a version that takes into account how deep it is?
+;; ^^ maybe the * OH MY GAWD ch would help w/ this!?
