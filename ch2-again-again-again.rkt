@@ -102,7 +102,7 @@
 ;; ^^ what's after a lambda will be applied to it!!
 
 ;; finished contains func
-(define ordered-contains? 
+(define contains2? 
   (lambda (a lat)
     (cond 
       ;; check if the end..
@@ -113,17 +113,22 @@
   
       ;; check if we should recur a again??
       ((eq? (car a) (car lat)) 
-            (contains? (cdr a) (cdr lat)))
+            (contains2? (cdr a) (cdr lat)))
         
       ;; recur lat again
-      (else (contains? a (cdr lat)))
+      (else (contains2? a (cdr lat)))
     )))
-(contains? '(a c) '(a b c)) ;=> #t   
-(contains? '(c a) '(a b c)) ;=> #f   
-(contains? '(b c) '(a b c)) ;=> #t
-(contains? '(a c c d) '(d f a c j k c l d)) ;=> #t
+(contains2? '(a c) '(a b c)) ;=> #t   
+(contains2? '(c a) '(a b c)) ;=> #f   
+(contains2? '(b c) '(a b c)) ;=> #t
+(contains2? '(a c c d) '(d f a c j k c l d)) ;=> #t
 ;; this contains func checks ordered contains..
 ;; so as long as the s-exp a appears in that order in lat then it is #t
+(contains2? '(a b c) '(a b a b c))
 
+;; contains idea..
+(contains3? 
+  (lambda (a lat aog latog) ;; og means "original"
+    )) ;; the idea is to have the og vars not change
 
 
