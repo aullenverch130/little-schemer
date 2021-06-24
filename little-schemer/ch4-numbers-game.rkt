@@ -143,7 +143,7 @@
 
 (define printmap
     (lambda (x)
-        (print x)))
+        (print x))))
 
 (define displaylist
     (lambda (x)
@@ -328,7 +328,10 @@
 ;; (1 3 1 2 1 1 3) => ((1 4) (2 1) (3 2))
 ;; (1 3 1 (3 3 3 2 2 1) 2 1 1 3) => ( (1 4) (2 1) (3 2) 
 ;;                                   ((1 1) (2 2) (3 3)) )
+;; or takes tup and outputs nested ordered
+;; ex: (1 1 4 3 3 6 5) => (((((1 1) 3 3 ) 4) 5) 6) 
 ;; ^^ maybe a version that takes into account how deep it is?
 ;; ^^ maybe the * OH MY GAWD ch would help w/ this!?
 
 ;; test name
+
