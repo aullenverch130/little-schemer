@@ -113,13 +113,93 @@
 
 
 
-;; TODO:
-; (define subst*
-;   (lambda (new old l)
-;     (cond
-;       ((null? l) '())
-;       ((atom? (car l))
-;         (cond
-;           ((eq? old (car l)) _)
-;           (else _)))
-;       (else _))))
+;; my try at subst* func
+(define subst*
+  (lambda (new old l)
+    (cond
+      ((null? l) '())
+      ((atom? (car l))
+        (cond
+          ((eq? old (car l)) 
+            (cons new (subst* new old (cdr l))))
+          (else (cons (car l) (subst* new old (cdr l))))))
+      (else (cons 
+              (subst* new old (car l))
+              (subst* new old (cdr l)))))))
+'((banana)
+  (split ((((banana ice)))
+          (cream (banana))
+          sherbet))
+  (banana)
+  (bread)
+  (banana brandy))
+'((b) (s ((((b i))) (c (b)) s) ) (b)(br)(b br) )
+
+;; attempts at writting out the evaluation for ^^
+; (subst* 'o 'b '((b) (s ((((b i))) (c (b)) s) ) (b)(br)(b br) ))
+; (cons 
+;   (subst* 'o 'b '(b))
+;   (subst* 'o 'b '((s ((((b i))) (c (b)) s) ) (b)(br)(b br) )))
+; (cons 
+;   (cons 'o (subst* 'o 'b '()))
+;   (subst* 'o 'b '((s ((((b i))) (c (b)) s) ) (b)(br)(b br) )))
+; (cons 
+;   (cons 'o '())
+;   (subst* 'o 'b '((s ((((b i))) (c (b)) s) ) (b)(br)(b br) )))
+; (cons 'o
+;   (subst* 'o 'b '((s ((((b i))) (c (b)) s) ) (b)(br)(b br) )))
+; (cons 'o
+;   (cons (subst* 'o 'b '(s ((((b i))) (c (b)) s) ) ))
+;   (subst* 'o 'b '((b)(br)(b br))))
+; (cons 'o
+;   (cons (cons 's (subst* 'o 'b '((((b i))) (c (b)) s)) ))
+;   (subst* 'o 'b '((b)(br)(b br))))
+; (cons 'o
+;   (cons 
+;     (cons 's 
+;       (cons (subst* 'o 'b '((((b i)))) )
+;             (subst* 'o 'b '((c (b)) s) ))
+;   (subst* 'o 'b '((b)(br)(b br))))
+; (cons 'o
+;   (cons 
+;     (cons 's 
+;       (cons (subst* 'o 'b '((((b i)))) )
+;       (subst* 'o 'b '((c (b)) s) ))
+  ; (subst* 'o 'b '((b)(br)(b br))))
+
+;; my try @ insertL*
+(define insertL* 
+  (lambda (new old l)
+    (cond 
+      ((null? l) '())
+      ((atom? (car l))
+        (cond
+          ((eq? old (car l)) 
+            (cons new (cons (car l) (insertL* new old (cdr l)))))
+          (else 
+            (cons (car l) (insertL* new old (cdr l))))))
+      (else (cons (insertL* new old (car l))
+                  (insertL* new old (cdr l)))))))
+'((how much (wood))
+  could
+  ((a (wood) chuck))
+  (((chuck)))
+  (if (a) ((wood chuck)))
+  could cuck wood)
+
+
+
+  ;; my try @ member*
+(define member*
+  (lambda (a l)
+    (cond 
+      ((null? l) #f)
+      ((atom? (car l)) 
+        (cond
+          ((eq? a (car l)) #t)
+          (else (member* a (cdr l)))))
+      (else (or
+              (member* a (car l))
+              (member* a (cdr l)))))))
+'((potato) (chips ((with) fish) (chips)))
+;; ^^ book did it different
