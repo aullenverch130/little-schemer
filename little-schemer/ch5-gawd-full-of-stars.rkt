@@ -83,6 +83,43 @@
 (add* '(1 (2 (1 1) 3) 5 4)) ;=> 17
 ;;^^ you don't consider the case where (car tup) is a atom
 
+;; my try @ occur*
+(define occur* 
+  (lambda (a l)
+    (cond
+      ((null? l) 0)
+      ((atom? (car l)) 
+        (cond 
+          ((eq? a (car l)) (add1 (occur* a (cdr l))))
+          (else (occur* a (cdr l)))))
+      (else (myplus (occur* a (car l))
+                  (occur* a (cdr l)))))))
+'(a (a b) a)
+
+;; writing out the order I think it evaluates
+(occur* 'a '(a (a b) a) )
+(add1 (occur* 'a '((a b) a)))
+(add1 (myplus (occur* 'a '(a b)) (occur* 'a '(a))))
+(add1 (myplus (add1 (occur* 'a '(b))) (occur* 'a '(a))))
+(add1 (myplus (add1 (occur* 'a '())) (occur* 'a '(a))))
+(add1 (myplus (add1 0) (occur* 'a '(a))))
+(add1 (myplus (add1 0) (add1 (occur* 'a '()))))  ;; <-- or does it eval (add1 0)
+(add1 (myplus (add1 0) (add1 0))) 
+(add1 (myplus 1 (add1 0)))
+(add1 (myplus 1 1))
+(add1 2)
+3
+; ^^ how does it know to finally eval once it has the correct args for the func call?
 
 
 
+;; TODO:
+; (define subst*
+;   (lambda (new old l)
+;     (cond
+;       ((null? l) '())
+;       ((atom? (car l))
+;         (cond
+;           ((eq? old (car l)) _)
+;           (else _)))
+;       (else _))))

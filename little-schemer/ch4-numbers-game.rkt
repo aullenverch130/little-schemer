@@ -143,7 +143,7 @@
 
 (define printmap
     (lambda (x)
-        (print x))))
+        (print x)))
 
 (define displaylist
     (lambda (x)
