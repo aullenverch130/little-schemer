@@ -1,6 +1,7 @@
 #lang racket
 
 
+
 ; atom? from book
 (define atom? 
   (lambda (x) 
@@ -10,6 +11,21 @@
   (lambda (n counter)
     (cond ((zero? counter) n)
           (else (myplus (add1 n) (sub1 counter))))))
+;; my= from book ch4
+(define my= 
+  (lambda (n m)
+    (cond 
+      ((zero? m) (zero? n))
+      ((zero? n) #f)
+      (else (my= (sub1 n) (sub1 m))))))
+      ;; ^^ the cases are acounted for if either m or n hit zero
+;; eqan? from book, ch 4
+(define eqan? 
+    (lambda (a1 a2)
+        (cond
+            ((and (number? a1) (number? a2)) (my= a1 a2))
+            ((or (number? a1) (number? a2)) #f)
+            (else (eq? a1 a2)))))
 
 
 
@@ -224,3 +240,57 @@
 ;; ex: of and returning #t
 (and (atom? (car '(a b c))) (eq? (car '(a b c)) 'a))
 
+;; the 9 cases
+; empty empty, atom atom, list list
+; empty list, empty atom
+; atom empty, atom list 
+; list empt, list atom
+
+(define eqlist1?
+  (lambda (l1 l2)
+    (cond
+      ((and (null? l1) (null? l2)) #t) ;; empty empty
+      ((and (null? l1) (atom? (car l2))) #f) ;; empty atom
+      ((null? l1) #f) ;; empty list
+      ((and (atom? (car l1)) (null? l2)) #f) ;; atom empty
+      ((and (atom? (car l1)) (atom? (car l2))) ;; atom atom
+        (and (eq? (car l1) (car l2))
+             (eqlist? (cdr l1) (cdr l2))))
+      ((atom? (car l1)) #f) ;; atom list
+      ((null? l2) #f) ;; list empty 
+      ((atom? (car l2)) #f) ;; list atom
+      (else ;; list list
+        (and (eqlist1? (car l1) (car l2))
+             (eqlist1? (cdr l1) (cdr l2)))))))
+; (eqlist1? '(strawberry ice cream) '(strawberry ice cream))
+; (eqlist1? '(banana ((split))) '((banana) (split)))
+
+
+
+
+;; equal list w/ parens 
+(define eqlist?
+  (lambda (l1 l2)
+    (cond
+      ((and (null? l1) (null? l2)) #t) ;<-- it got to the end
+      ((or (null? l1) (null? l2)) #f)
+
+      ;; so close 
+      ((and (atom? (car l1)) (atom? (car l2)))
+        (and (eq? (car l1) (car l2))
+             (eqlist? (cdr l1) (cdr l2))))
+      
+      ((or (atom? (car l1)) (atom? (car l2))) #f)
+
+      (else (and (eqlist? (car l1) (car l2)) 
+                 (eqlist? (cdr l1) (cdr l2)))))))
+; (eqlist? '(beef ((sausage)) (and (soda))) '(beef ((salami)) (and (soda))))
+; (eqlist? '(strawberry ice cream) '(strawberry ice cream))
+; (eqlist? '(banana ((split))) '((banana) (split)))
+
+
+
+
+
+
+ 
