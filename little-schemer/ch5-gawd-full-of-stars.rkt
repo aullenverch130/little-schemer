@@ -196,10 +196,31 @@
       ((null? l) #f)
       ((atom? (car l)) 
         (cond
-          ((eq? a (car l)) #t)
-          (else (member* a (cdr l)))))
+          ((eq? a (car l)) #t) (else (member* a (cdr l)))))
       (else (or
-              (member* a (car l))
-              (member* a (cdr l)))))))
+              (member* a (car l)) (member* a (cdr l)))))))
 '((potato) (chips ((with) fish) (chips)))
 ;; ^^ book did it different
+
+;; version of member* from book
+(define member2*
+  (lambda (a l)
+    (cond
+      ((null? l) #f)
+      ((atom? (car l))
+        (or (eq? a (car l)) (member2* a (cdr l))))
+      (else (or (member2* a (car l)) (member2* a (cdr l)))))))
+
+;; my try @ leftmost
+(define leftmost 
+  (lambda (l)
+    (cond
+      ((null? l) "no leftmost atom")
+      ((atom? (car l)) (car l))
+      (else (leftmost (car l))))))
+(leftmost '(((() four)) 17 (seventeen))) ;=> "no leftmost atom"
+(leftmost '(((hot) (tuna (and))) cheese)) ;=> 'hot
+
+;; ex: of and returning #t
+(and (atom? (car '(a b c))) (eq? (car '(a b c)) 'a))
+
