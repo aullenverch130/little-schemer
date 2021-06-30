@@ -26,7 +26,32 @@
             ((and (number? a1) (number? a2)) (my= a1 a2))
             ((or (number? a1) (number? a2)) #f)
             (else (eq? a1 a2)))))
-
+;; doesn't work with none symbol atoms
+(define stringify*
+  (lambda (l)
+    (cond
+      ((null? l) "")
+      ((atom? (car l))
+        (cond 
+          ((null? (cdr l)) 
+            (string-append 
+                (symbol->string (car l)) (stringify* (cdr l))))
+          (else 
+            (string-append 
+                (symbol->string (car l)) " " (stringify* (cdr l))))))
+      (else 
+        (cond 
+          ((null? (cdr l)) 
+            (string-append "("
+              (stringify* (car l)) ")" (stringify* (cdr l))))
+          (else 
+            (string-append "("
+              (stringify* (car l)) ") " (stringify* (cdr l)))))))))
+(define print-S
+  (lambda (s)
+    (display (string-append "(" s ")"))))
+(print-S (stringify* '(a (b) c))) ;=> (a (b) c)
+(print-S (stringify* '(a ((b)) c))) ;=> (a ((b)) c)
 
 
 (define rember*
@@ -149,39 +174,8 @@
   (banana)
   (bread)
   (banana brandy))
-'((b) (s ((((b i))) (c (b)) s) ) (b)(br)(b br) )
 
-;; attempts at writting out the evaluation for ^^
-; (subst* 'o 'b '((b) (s ((((b i))) (c (b)) s) ) (b)(br)(b br) ))
-; (cons 
-;   (subst* 'o 'b '(b))
-;   (subst* 'o 'b '((s ((((b i))) (c (b)) s) ) (b)(br)(b br) )))
-; (cons 
-;   (cons 'o (subst* 'o 'b '()))
-;   (subst* 'o 'b '((s ((((b i))) (c (b)) s) ) (b)(br)(b br) )))
-; (cons 
-;   (cons 'o '())
-;   (subst* 'o 'b '((s ((((b i))) (c (b)) s) ) (b)(br)(b br) )))
-; (cons 'o
-;   (subst* 'o 'b '((s ((((b i))) (c (b)) s) ) (b)(br)(b br) )))
-; (cons 'o
-;   (cons (subst* 'o 'b '(s ((((b i))) (c (b)) s) ) ))
-;   (subst* 'o 'b '((b)(br)(b br))))
-; (cons 'o
-;   (cons (cons 's (subst* 'o 'b '((((b i))) (c (b)) s)) ))
-;   (subst* 'o 'b '((b)(br)(b br))))
-; (cons 'o
-;   (cons 
-;     (cons 's 
-;       (cons (subst* 'o 'b '((((b i)))) )
-;             (subst* 'o 'b '((c (b)) s) ))
-;   (subst* 'o 'b '((b)(br)(b br))))
-; (cons 'o
-;   (cons 
-;     (cons 's 
-;       (cons (subst* 'o 'b '((((b i)))) )
-;       (subst* 'o 'b '((c (b)) s) ))
-  ; (subst* 'o 'b '((b)(br)(b br))))
+
 
 ;; my try @ insertL*
 (define insertL* 
@@ -217,6 +211,7 @@
               (member* a (car l)) (member* a (cdr l)))))))
 '((potato) (chips ((with) fish) (chips)))
 ;; ^^ book did it different
+
 
 ;; version of member* from book
 (define member2*
@@ -255,7 +250,7 @@
       ((and (atom? (car l1)) (null? l2)) #f) ;; atom empty
       ((and (atom? (car l1)) (atom? (car l2))) ;; atom atom
         (and (eq? (car l1) (car l2))
-             (eqlist? (cdr l1) (cdr l2))))
+             (eqlist1? (cdr l1) (cdr l2))))
       ((atom? (car l1)) #f) ;; atom list
       ((null? l2) #f) ;; list empty 
       ((atom? (car l2)) #f) ;; list atom
@@ -265,7 +260,23 @@
 ; (eqlist1? '(strawberry ice cream) '(strawberry ice cream))
 ; (eqlist1? '(banana ((split))) '((banana) (split)))
 
+(define eqlist2?
+  (lambda (lg l1 l2)
+    (cond
+      ((and (null? l1) (null? l2)) (display lg) #t) ;<-- it got to the end
+      ((or (null? l1) (null? l2)) (display lg) #f)
 
+      ;; so close 
+      ((and (atom? (car l1)) (atom? (car l2)))
+        (and (eq? (car l1) (car l2))
+             (eqlist2? lg (cdr l1) (cdr l2))))
+      ((or (atom? (car l1)) (atom? (car l2))) (display lg) #f)
+
+      (else 
+        (and (eqlist2? lg (car l1) (car l2)) 
+                 (eqlist2? lg (cdr l1) (cdr l2)))))))
+; (eqlist2? '() '(b ((s)) (a (o))) '(b ((s)) (a (o))))
+ 
 
 
 ;; equal list w/ parens 
@@ -275,7 +286,6 @@
       ((and (null? l1) (null? l2)) #t) ;<-- it got to the end
       ((or (null? l1) (null? l2)) #f)
 
-      ;; so close 
       ((and (atom? (car l1)) (atom? (car l2)))
         (and (eq? (car l1) (car l2))
              (eqlist? (cdr l1) (cdr l2))))
@@ -285,12 +295,78 @@
       (else (and (eqlist? (car l1) (car l2)) 
                  (eqlist? (cdr l1) (cdr l2)))))))
 ; (eqlist? '(beef ((sausage)) (and (soda))) '(beef ((salami)) (and (soda))))
-; (eqlist? '(strawberry ice cream) '(strawberry ice cream))
-; (eqlist? '(banana ((split))) '((banana) (split)))
+; (eqlist2? '(strawberry ice cream) '(strawberry ice cream))
+; (eqlist2? '(banana ((split))) '((banana) (split)))
+; (eqlist2? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda))))
+
+(define equal? 
+  (lambda (lg s1 s2)
+    (cond 
+      ((and (atom? s1) (atom? s2))
+        (eq? s1 s2))
+      ((atom? s1) #f)
+      ((atom? s2) #f)
+      (else 
+        (eqlistlg? lg s1 s2)))))
 
 
+(define eqlistlg?
+  (lambda (lg l1 l2)
+    (cond
+      ((and (null? l1) (null? l2)) (display lg) #t) ;<-- it got to the end
+      ((or (null? l1) (null? l2)) #f)
 
-
-
-
+      (else 
+        (and (equal? lg (car l1) (car l2)) 
+             (equal? lg (cdr l1) (cdr l2)))))))
+; (eqlist?log '() '(b ((s)) (a (o))) '(b ((s)) (a (o))))
  
+ ;; TODO: plan, after everything has evaluated, display everything
+
+(define equal1? 
+  (lambda (s1 s2)
+    (cond 
+      ((and (atom? s1) (atom? s2))
+        (eq? s1 s2))
+      ((atom? s1) #f)
+      ((atom? s2) #f)
+      (else 
+        (eqlist? s1 s2)))))
+
+; (display "(and (equal? ") (display (car l1)) (display " ") (print (car l2)) (display ") ") 
+;         (display "(equal? ") (print (cdr l1)) (display " ") (print (cdr l2)) (display "))") 
+;         (newline)
+
+(define rember
+  (lambda (s l)
+    (cond 
+      ((null? l) '())
+      ((atom? (car l))
+        (cond 
+          ((equal1? (car l) s) (cdr l))
+          (else (cons (car l) (rember s (cdr l))))))
+      (else
+        (cond 
+          ((equal1? (car l) s) (cdr l))
+          (else (cons (car l) (rember s (cdr l)))))))))
+(rember '(a) '((b) (a) c)) ;=> '((b) c)
+
+(define rembersim
+  (lambda (s l)
+    (cond 
+      ((null? l) '())
+      (else
+        (cond 
+          ((equal1? (car l) s) (cdr l))
+          (else (cons (car l) (rembersim s (cdr l)))))))))
+(rembersim '(a) '((b) (a) c)) ;=> '((b) c)
+
+(define rembers2
+  (lambda (s l)
+    (cond 
+      ((null? l) '())
+      (else
+        (cond 
+          ((equal1? (car l) s) (cdr l))
+          (else (cons (car l) (rembers2 s (cdr l)))))))))
+(rembersim '(a) '((b) (a) c)) ;=> '((b) c)
