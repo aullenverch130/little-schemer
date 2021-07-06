@@ -1,4 +1,4 @@
-#lang racket
+#lang racket 
 
 ;; from book
 (define atom? 
@@ -7,6 +7,7 @@
 (define add1
   (lambda (x) 
     (+ x 1)))
+
 (define stringify-ln*
   (lambda (depth l)
     ;; ln* creates a string of the database with new lines every row
@@ -53,7 +54,7 @@
 ; (print-S (stringify* '(a ((b)) c))) ;=> (a ((b)) c)
 
 ;; ex: of new line in string
-(display "hello\ntest\n")
+; (display "hello\ntest\n")
 
 
 
@@ -63,11 +64,11 @@
 
 
 ;; ex: on how to get input!!
-(display "Please enter your name: ")
-(define name (read))
-(display "Hello, ")
-(display name)
-(newline)
+; (display "Please enter your name: ")
+; (define name (read))
+; (display "Hello, ")
+; (display name)
+; (newline)
 
 
 
@@ -129,7 +130,7 @@
 (define print-room
     (lambda (room)
         (display (stringify-ln* 0 room-ex))))
-(print-room room-ex)
+; (print-room room-ex)
 
 
 
@@ -150,6 +151,7 @@
             (4 "wooden panel")))
         ("small vase"
             (3 "ceramic shards"))  ))
+
 
 (define backpack
     '( (1 "paper" read ("Dear adventurer!"))))
@@ -188,14 +190,17 @@
 ;; input strings and use to apply functions && print output
 ;; maybe have a list of possible commands? like show, move, take...
 (define commands
-    '((move left) (move right) (move up) (move down)
+    '(("move" left) (move right) (move up) (move down)
       (a d w s)
       (move x, y) (move x y)
       (take symbol) (take obj)
       (put symbol) (put obj)
       (show craftable objects) (show craftables)
       (show makeable objects) (show makeables)
+
       (show backpack) (show room) (show symbol) (show obj)
+      (show room)
+
       (break symbol) (break obj)
       (craft symbol) (craft obj)
       (make symbol) (make obj)
@@ -203,9 +208,44 @@
       (read symbol) (read obj)))
 ;; ^^ these are the possible commands that could be 
 
+; (define show-room 
+ 
+; )
 
 
+;(define input (read))
 
-;
+;(define parser 
+ ;(lambda  (read) 
+  ;(cond h
+    ;((eq? read 'end) "good bye")
+    ;(else (parser (read))))))
+(define parser
+  (lambda ()
+    (display "Enter command")
+    (define input (read))
+    (display input) (newline)
+    (cond
+      ((null? input) (parser))
+      ((eq? input 'end) "goodbye")
+
+      ((eq? input 'show) )
+
+      (else (parser)))))
+
+;(parser)
+; (display parser)
+;(display input)
+; (print-room room-ex)
 
 
+;; ex: on how to get input!!
+; (display "Please enter your name: ")
+; (define name (read))
+; (display "Hello, ")
+; (display (symbol? name))
+; (newline)
+
+(define phrase (read))
+(display phrase)
+(display (string? phrase))
