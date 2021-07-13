@@ -8,6 +8,33 @@
   (lambda (x) 
     (+ x 1)))
 
+(define equal? 
+  (lambda (s1 s2)
+    (cond 
+      ((and (atom? s1) (atom? s2))
+        (eq? s1 s2))
+      ((atom? s1) #f)
+      ((atom? s2) #f)
+      (else 
+        (eqlist? s1 s2)))))
+
+(define eqlist?
+  (lambda (l1 l2)
+    (cond
+      ((and (null? l1) (null? l2)) #t) ;<-- it got to the end
+      ((or (null? l1) (null? l2)) #f)
+
+      (else 
+        (and (equal? (car l1) (car l2)) 
+             (equal? (cdr l1) (cdr l2)))))))
+(eqlist? '(b ((s)) (a (o))) '(b ((s)) (a (o))))
+
+
+
+
+
+
+
 (define stringify-ln*
   (lambda (depth l)
     ;; ln* creates a string of the database with new lines every row
@@ -208,44 +235,45 @@
       (read symbol) (read obj)))
 ;; ^^ these are the possible commands that could be 
 
-; (define show-room 
- 
-; )
 
 
-;(define input (read))
 
-;(define parser 
- ;(lambda  (read) 
-  ;(cond h
-    ;((eq? read 'end) "good bye")
-    ;(else (parser (read))))))
+
+
 (define parser
   (lambda ()
-    (display "Enter command")
-    (define input (read))
-    (display input) (newline)
+    (display "Enter command: ")
+    (define input (read-line))
+    (write input) (newline)
+
     (cond
-      ((null? input) (parser))
-      ((eq? input 'end) "goodbye")
+      ((eqlist? (string->list "end\r") (string->list input)) "goodbye")
+      ;; when testing always do string->to 
+      (else (parser))
+     )))
 
-      ((eq? input 'show) )
-
-      (else (parser)))))
-
-;(parser)
-; (display parser)
-;(display input)
-; (print-room room-ex)
+(parser)
 
 
-;; ex: on how to get input!!
+; (eqlist? (string->list "end") (string->list "end"))
+; (write (string->list "end")) ;=> (#\e #\n #\d)
+; (write (string->list "end\r")) ;=> (#\e #\n #\d #\return)
+;; TODO: write func to convert list of char to list of words
+;; TODO: lchar->lword
+
+
+
+
+
+
+;; ex: input
 ; (display "Please enter your name: ")
 ; (define name (read))
 ; (display "Hello, ")
-; (display (symbol? name))
-; (newline)
+; (display (string? name))
+; name
 
-(define phrase (read))
-(display phrase)
-(display (string? phrase))
+; (define input (read-line (current-input-port) 'any))
+; (string->symbol "hey testing this") ;=> '|hey testing this|
+
+

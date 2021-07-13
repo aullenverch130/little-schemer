@@ -184,7 +184,7 @@
       ((null? l) '())
       ((atom? (car l))
         (cond
-          ((eq? old (car l)) 
+          ((equal1? old (car l)) 
             (cons new (cons (car l) (insertL* new old (cdr l)))))
           (else 
             (cons (car l) (insertL* new old (cdr l))))))
@@ -196,6 +196,9 @@
   (((chuck)))
   (if (a) ((wood chuck)))
   could cuck wood)
+
+
+
 
 
 
@@ -280,7 +283,7 @@
 
 
 ;; equal list w/ parens 
-(define eqlist?
+(define eqlistl?
   (lambda (l1 l2)
     (cond
       ((and (null? l1) (null? l2)) #t) ;<-- it got to the end
@@ -300,25 +303,25 @@
 ; (eqlist2? '(beef ((sausage)) (and (soda))) '(beef ((sausage)) (and (soda))))
 
 (define equal? 
-  (lambda (lg s1 s2)
+  (lambda (s1 s2)
     (cond 
       ((and (atom? s1) (atom? s2))
         (eq? s1 s2))
       ((atom? s1) #f)
       ((atom? s2) #f)
       (else 
-        (eqlistlg? lg s1 s2)))))
+        (eqlist? s1 s2)))))
 
 
-(define eqlistlg?
-  (lambda (lg l1 l2)
+(define eqlist?
+  (lambda (l1 l2)
     (cond
-      ((and (null? l1) (null? l2)) (display lg) #t) ;<-- it got to the end
+      ((and (null? l1) (null? l2)) #t) ;<-- it got to the end
       ((or (null? l1) (null? l2)) #f)
 
       (else 
-        (and (equal? lg (car l1) (car l2)) 
-             (equal? lg (cdr l1) (cdr l2)))))))
+        (and (equal? (car l1) (car l2)) 
+             (equal? (cdr l1) (cdr l2)))))))
 ; (eqlist?log '() '(b ((s)) (a (o))) '(b ((s)) (a (o))))
  
  ;; TODO: plan, after everything has evaluated, display everything
@@ -369,4 +372,21 @@
         (cond 
           ((equal1? (car l) s) (cdr l))
           (else (cons (car l) (rembers2 s (cdr l)))))))))
-(rembersim '(a) '((b) (a) c)) ;=> '((b) c)
+(rembers2 '(a) '((b) (a) c)) ;=> '((b) c)
+
+;; same as insertL* but inserts S exp too
+(define SinsertL* 
+  (lambda (new old l)
+    (cond 
+      ((null? l) '())
+      ((atom? (car l))
+        (cond
+          ((eq? old (car l)) 
+            (cons new (cons (car l) (SinsertL* new old (cdr l)))))
+          (else 
+            (cons (car l) (SinsertL* new old (cdr l))))))
+      ((equal1? old (car l))
+        (cons new (cons (car l) (SinsertL* new old (cdr l)))))
+      (else (cons (SinsertL* new old (car l))
+                  (SinsertL* new old (cdr l)))))))
+(SinsertL* '(c) '(b) '((b) b (a) c (b (b))))
