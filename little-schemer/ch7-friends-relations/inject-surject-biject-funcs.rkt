@@ -1,4 +1,10 @@
-#lang racket
+
+
+;; this is a "mini proj" implementing 
+;; injective, surjective, and bijective func checkers
+;; given the domain, codomain, and image sets
+;; based off of what was learned in ch 7
+
 
 
 ;; from ch. 2
@@ -45,7 +51,6 @@
       (else (cons (car (cdr (car x))) (seconds (cdr x)))))))
 (seconds '((a b) (b c) (c d))) ;=> (b c d)   
 
-
 ;; trying 1 cond line eqset
 (define eqset?
     (lambda (set1 set2)
@@ -53,21 +58,28 @@
              (subset? set2 set1))))
 (eqset? '(6 large chickens with wings) '(6 chickens with large wings))
 
-;; writing "fun?", funcs can't have one-to-many rel
 
 
+
+
+
+
+;; friend functions for fun? 
+  ;; surjectfun? injectfun? bijectfun?
 (define len 
     (lambda (x)
         (cond 
             ((null? x) 0)
             (else (add1 (len (cdr x)))))))
-
+            
 (define eqlen
   (lambda (a b)
     (eq? (len a) (len b))))
 
+(eqlen '(1 2 3 4 5) '(1 2 3 4 5))
+(eqlen '(1 2) '(1 2 3))
 
-(eqlen '(1 2 3) '(4 5 6))
+
 
 (define fun? 
     (lambda (domain codomain image) 
@@ -76,33 +88,33 @@
           ((eqlen domain image) #t)
           (else #f))))
 (fun? '(1 2 3 4 5) '(a b c d e) '(a b c d c))
+(fun? '(1 2) '(a b c d e) '(a b c d c))
+
+; define injectfun?
+(define injectfun?
+    (lambda (domain codomain image)
+        (and (fun? domain codomain image)
+             (set? image))))
 
 
+;; surjectfun?
+(define surjectfun?
+  (lambda (domain codomain image)
+    (and (fun? domain codomain image)
+             (subset? codomain image))))  
+(surjectfun? '(1 2 3 4 5) '(a b c d) '(a b c d c))
+; (surjectfun? '((8 3)(4 2)))
 
-;; TODO: domain needs to be set.., 
-
-; (fun? '((8 3) (4 2) (7 6) (6 2) (3 4)))
-; (fun? '((d 4) (b 0) (b 9) (e 5) (g 4)))
-
-
-;; define injectfun?
-; (define injectfun?
-;     (lambda (rel)
-;         (and (fun? rel)
-;              (set? (seconds rel)))))
-; (print "faithful fun tests") (newline)
-; (injectfun? '((8 3) (4 2) (7 6) (6 2) (3 4)))
-; (injectfun? '((8 3) (4 8) (7 6) (6 2) (3 4)))
-
-; ;; surjectfun?
-; (define surjectfun?
-;   (lambda (rel codamin)
-;     (and (fun? rel)
-;              (set? (seconds rel)))))
-;              ;; eqset? ^^
-            
-
-;(surjectfun? '((8 3)(4 2)))
+;should return false
+(injectfun? '(1 2 3 4 5) '(a b c d) '(a b c d c))
+;should return true
+(injectfun? '(1 2 3 4 5) '(a b c d e) '(a b c d e))
 
 
-;; TODO: bijectfun?
+;; bijectfun
+(define bijectfun?
+    (lambda (domain codomain image)
+        (and (injectfun? domain codomain image)
+              (surjectfun? domain codomain image))))
+
+(bijectfun? '(1 2 3 4 5) '(a b c d e) '(a b c d e))
