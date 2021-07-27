@@ -34,6 +34,8 @@
       (else 
         (and (equal? (car l1) (car l2)) 
              (equal? (cdr l1) (cdr l2)))))))
+
+
 ;; from ch. 5
 (define rember
   (lambda (s l)
@@ -43,12 +45,25 @@
       (else (cons (car l) (rember s (cdr l)))))))
 (rember '(a) '((b) (a) c)) ;=> '((b) c)
 
+;; from ch. 3
+(define insertL 
+  (lambda (new old lat) 
+    (cond 
+      ((null? lat) '())
+      ((eq? (car lat) old) (cons new (cons old (cdr lat))))
+      (else (cons (car lat) (insertL new old (cdr lat)))))))
+(insertL 'topping 'fudge '(ice cream with fudge for dessert))
 
+;; from ch. 3
+(define insertR
+  (lambda (new old lat)
+    (cond 
+      ((null? lat) '())
+      ((eq? (car lat) old)
+        (cons old (cons new (cdr lat))))
+      (else (cons (car lat) (insertR new old (cdr lat)))))))
+(insertR 'topping 'fudge '(ice cream with fudge for dessert))
 
-;; trying rember-f
-; (define rember-f
-;     (lambda (test? a l)
-;         (test? a l)))
 
 ;; trying rember-f
 (define rember-f
@@ -94,3 +109,44 @@ eq?-salad
 ((rember-f1 eq?) 'tuna '(shrimp and tuna salad))
 
 ((rember-f1 eq?) eq? '(equal? eq? eqan? eqlist? eqpair?))
+
+(define insertL-f
+ (lambda (test?)
+  (lambda (new old lat)
+    (cond 
+        ((null? lat) '())
+        ((test? (car lat) old) 
+            (cons new (cons old (cdr lat))))
+        (else (cons (car lat) ((insertL-f test?) new old (cdr lat))))))))
+((insertL-f eq?) '2 'b '(a b c))
+
+(define insertR-f
+ (lambda (test?)
+  (lambda (new old lat)
+    (cond 
+      ((null? lat) '())
+      ((test? (car lat) old)
+        (cons old (cons new (cdr lat))))
+      (else (cons (car lat) ((insertR-f test?) new old (cdr lat))))))))
+((insertR-f eq?) '2 'b '(a b c))
+
+(define insert-g
+ (lambda (LorR)
+  (lambda (test?)
+   (lambda (new old lat)
+    (cond 
+     ((null? lat) '())
+     ((test? (car lat) old)
+        (LorR 'a))
+      (cons old (cons new (cdr lat))  ))
+     (else (cons (car lat) 
+            (((insert-g LorR) test?) new old (cdr lat)))))))))
+(((insert-g insertL-f) eq?) '2 'b '(a b c))
+
+; (cond 
+;  ((null? lat) '())
+;  ((test? (car lat) old)
+;     (cons old (cons new (cdr lat))))
+;  (else (cons (car lat) ((insertR-f test?) new old (cdr lat)))))
+
+; (((insert-g LorR) test?) new old (cdr lat))
