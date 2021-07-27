@@ -340,6 +340,7 @@
 ;         (display "(equal? ") (print (cdr l1)) (display " ") (print (cdr l2)) (display "))") 
 ;         (newline)
 
+;; there is no need for the atom? vs else conditions!!
 (define rember
   (lambda (s l)
     (cond 
