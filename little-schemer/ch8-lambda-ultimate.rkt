@@ -130,23 +130,85 @@ eq?-salad
       (else (cons (car lat) ((insertR-f test?) new old (cdr lat))))))))
 ((insertR-f eq?) '2 'b '(a b c))
 
+;; my attempt @ insert-g
 (define insert-g
  (lambda (LorR)
   (lambda (test?)
    (lambda (new old lat)
-    (cond 
-     ((null? lat) '())
-     ((test? (car lat) old)
-        (LorR 'a))
-      (cons old (cons new (cdr lat))  ))
-     (else (cons (car lat) 
-            (((insert-g LorR) test?) new old (cdr lat)))))))))
+     ((LorR test?) new old lat)))))
 (((insert-g insertL-f) eq?) '2 'b '(a b c))
 
-; (cond 
-;  ((null? lat) '())
-;  ((test? (car lat) old)
-;     (cons old (cons new (cdr lat))))
-;  (else (cons (car lat) ((insertR-f test?) new old (cdr lat)))))
 
-; (((insert-g LorR) test?) new old (cdr lat))
+;; defining seq funcs
+(define seqL 
+    (lambda (new old l)
+        (cons new (cons old l))))
+(seqL 'a 'b 'c)
+(define seqR
+    (lambda (new old l)
+        (cons old (cons new l))))
+(seqR 'a 'b 'c)
+
+
+;; interesting, here we are not returning the "insertL" procedure
+;; but we are returning a function that resembles it by using
+;; swapping the (cons new (cons old (cdr lat)))
+;; and (cons old (cons new (cdr lat))) lines..
+(define insert-g1
+ (lambda (seq)
+  (lambda (new old lat)
+    (cond 
+      ((null? lat) '())
+      ((eq? (car lat) old)
+        (seq new old (cdr lat)))
+      (else (cons (car lat) 
+        ((insert-g1 seq) new old (cdr lat))))))))
+(print "insert-g1 test") (newline)
+((insert-g1 seqR) 2 'b '(a b c))
+
+;; making a short cut for writing the funcs
+(define insertL1 (insert-g1 seqL))
+(define insertR1 (insert-g1 seqR))
+(insertL1 2 'b '(a b c))
+(insertR1 2 'b '(a b c))
+
+;; TODO: understand..
+(define insertL2 
+    (insert-g1
+        (lambda (new old lat)
+            (cons new (cons old lat)))))
+(insertL2 2 'b '(a b c))
+
+
+;; bringing back subst!
+(define subst
+    (lambda (new old l)
+        (cond
+            ((null? l) '())
+            ((eq? (car l) old) 
+                (cons new (cdr l)))
+            (else (cons (car l) 
+                    (subst new old (cdr l)))))))
+;; define a func like seqL / seqR but for subst
+
+(define seqsub
+    (lambda (new old lat)
+        (cons new lat)))
+(seqsub 'a 'b '(1 2))
+;; writing seqsub w/ subst
+(define subst1 (insert-g1 seqsub))
+(subst1 2 'b '(a b c))
+
+;; example from book that is like rember
+(define yyy
+    (lambda (a l)
+        ((insert-g1 seqrem) #f a l)))
+(define seqrem 
+    (lambda (new old l) l))
+(yyy 'sausage '(pizza with sausage and bacon))
+;; ^^ new is never used, so #f is never used.. 
+;; anything could be in place of #f and it would work
+;; but there must be something there for it to be 
+;; compatable with seqL and SeqR..
+
+;; book brings up value from ch. 6
