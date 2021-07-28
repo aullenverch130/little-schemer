@@ -320,3 +320,46 @@ multirember-equal?
 ; (multirember-T eq?-salad '(shrimp salad tuna salad and tuna))
 (multirember-T eq?-tuna '(shrimp salad tuna salad and tuna))
 (multirember-T eq?-salad '(shrimp salad tuna salad and tuna))
+
+
+;; multirmeber func from book w/ collectors (continuations)
+(define multirember&co
+ (lambda (a lat col)
+  (cond
+    ((null? lat) 
+        (col '() '()))
+    ((eq? (car lat) a) 
+        (multirember&co a
+            (cdr lat)
+            (lambda (newlat seen)
+                (col newlat (cons (car lat) seen)))))
+    (else
+        (multirember&co a 
+            (cdr lat)
+            (lambda (newlat seen)
+                (col (cons (car lat) newlat) seen)) )))))
+;; collectors
+(define a-friend ;; #t if second is null..
+    (lambda (x y)
+        (null? y)))
+; (define new-friend
+;     (lambda (newlat seen)
+;         (col newlat
+;             (cons (car lat) seen))))
+(define len ;; from ch.4
+    (lambda (x)
+        (cond 
+            ((null? x) 0)
+            (else (add1 (len (cdr x)))))))
+(define last-friend
+    (lambda (x y)
+        (len y)))
+
+(multirember&co 'tuna '(strawberries tuna and swordfish) a-friend)
+(multirember&co 'tuna '() a-friend)
+(multirember&co 'tuna '(tuna) a-friend)
+(multirember&co 'tuna '(strawberries tuna and swordfish) last-friend)
+
+
+
+
