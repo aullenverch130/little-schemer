@@ -172,7 +172,7 @@ eq?-salad
 (insertL1 2 'b '(a b c))
 (insertR1 2 'b '(a b c))
 
-;; TODO: understand..
+;; TODO: understand better..
 (define insertL2 
     (insert-g1
         (lambda (new old lat)
@@ -211,4 +211,112 @@ eq?-salad
 ;; but there must be something there for it to be 
 ;; compatable with seqL and SeqR..
 
-;; book brings up value from ch. 6
+
+
+
+
+;; book brings up value from ch. 6 and related functions
+;; trying sub-aexp1
+(define subexp1
+    (lambda (aexp)
+        (car aexp)))
+(define subexp2
+    (lambda (aexp)
+        (car (cdr (cdr aexp)))))
+;; operator
+(define operator
+    (lambda (aexp)
+        (car (cdr aexp))))
+
+(define value2
+    (lambda (aexp)
+        (cond
+            ((atom? aexp) aexp)
+            ((eq? (operator aexp) '+)
+                (+ (value2 (subexp1 aexp))
+                   (value2 (subexp2 aexp))))
+            ((eq? (operator aexp) 'x)
+                (* (value2 (subexp1 aexp))
+                   (value2 (subexp2 aexp))))
+            (else (my^ (value2 (subexp1 aexp)) 
+                       (value2 (subexp2 aexp)))))))
+(value2 '(1 + (3 x 4)))
+;; from ch. 4
+(define my^
+    (lambda (n m)
+        (cond 
+            ((zero? m) 1)
+            (else (* n (my^ n (sub1 m)))))))
+
+;; writing func that returns procedure based of atom given
+(define atom->fun 
+    (lambda (x)
+        (cond
+            ((eq? x '+) +)
+            ((eq? x 'x) *)
+            (else my^))))
+    
+;; the book is assuming that operator is (car aexp), aka prefix notation
+;; (atom->fun (operator '(+ 5 3)))
+(atom->fun (operator '(5 + 3)))
+
+;; writing value with two cond lines
+(define value3
+    (lambda (aexp)
+        (cond
+            ((atom? aexp) aexp)
+            (else ((atom->fun (operator aexp))
+                        (value3 (subexp1 aexp))
+                        (value3 (subexp2 aexp)))))))
+(value3 '(1 + (3 x 4)))
+
+;; book brings back multirember
+(define multirember
+    (lambda (a lat)
+        (cond
+            ((null? lat) '())
+            ((eq? (car lat) a)
+                (multirember a (cdr lat)))
+            (else (cons (car lat)
+                    (multirember a (cdr lat)))))))
+;; writing multirember-f for other eq?
+(define multirember-f
+ (lambda (test?)
+  (lambda (a lat)
+    (cond
+        ((null? lat) '())
+        ((test? (car lat) a)
+            ((multirember-f test?) a (cdr lat)))
+        (else (cons (car lat) 
+                ((multirember-f test?) a (cdr lat))))))))
+((multirember-f eq?) 'tuna '(shrimp salad tuna salad and tuna))
+
+;; RECURSIVE CURRYING!!?!
+
+;; church encodings!
+((lambda (x) x) 'y) ;; id 
+(((lambda (a) (lambda (b) a)) 'x) 'y) ;; true
+(((lambda (a) (lambda (b) b)) 'x) 'y) ;; false
+
+(define multirember-eq? (multirember-f eq?))
+(define multirember-equal? (multirember-f equal?))
+multirember-eq?
+multirember-equal?
+(multirember-eq? 'tuna '(shrimp salad tuna salad and tuna))
+(multirember-equal? 'tuna '(shrimp salad tuna salad and tuna))
+
+
+(define eq?-tuna (eq?-c 'tuna))
+;; eq?-salad is defined up there ^^
+
+(define multirember-T
+    (lambda (test? lat)
+        (cond
+            ((null? lat) '())
+            ((test? (car lat)) 
+                (multirember-T test? (cdr lat)))
+            (else 
+                (cons (car lat) (multirember-T test? (cdr lat)))))))
+; (multirember-T eq?-salad '(shrimp salad tuna salad and tuna))
+(multirember-T eq?-tuna '(shrimp salad tuna salad and tuna))
+(multirember-T eq?-salad '(shrimp salad tuna salad and tuna))
