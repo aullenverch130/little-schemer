@@ -362,4 +362,99 @@ multirember-equal?
 
 
 
+;; attempt @ multiinsertLR
+(define multiinsertLR
+ (lambda (new oldL oldR lat)
+  (cond
+    ((null? lat) '())
+    ((eq? oldL (car lat))
+        (cons new (cons oldL 
+            (multiinsertLR new oldL oldR (cdr lat)))))
+    ((eq? oldR (car lat))
+        (cons oldR (cons new 
+            (multiinsertLR new oldL oldR (cdr lat)))) )
+    (else 
+        (cons (car lat) (multiinsertLR new oldL oldR (cdr lat)))))))
+(multiinsertLR '@ 'b 'c '(a b c d b))
+;; ^^ you could also use seqL & seR, but w/o much benifit
 
+
+;; multiinsertLR&co from book
+(define multiinsertLR&co
+ (lambda (new oldL oldR lat col)
+  (cond
+    ((null? lat) (col '() 0 0))
+    ((eq? oldL (car lat))
+        (multiinsertLR&co new oldL oldR (cdr lat) 
+            (lambda (newlat L R)
+                (col (cons new (cons oldL newlat))
+                     (add1 L) R))))
+    ((eq? oldR (car lat))
+        (multiinsertLR&co new oldL oldR (cdr lat) 
+            (lambda (newlat L R)
+                (col (cons oldR (cons new newlat))
+                   R (add1 L) ))))
+    (else 
+        (multiinsertLR&co new oldL oldR (cdr lat)
+            (lambda (newlat L R)
+                (col (cons (car lat) newlat) L R)))))))
+; (multiinsertLR&co '@ 'b 'c '(a b c d b) a-friend)
+; (multiinsertLR&co 'salty 'fish 'chips '(chips and fish or fish and chips) a-friend)
+
+;; divide from ch. 4
+(define divideby
+    (lambda (n m)
+        (cond
+         ((< n m) 0)
+         (else (add1 (divideby (- n m) m))))))
+
+
+;; from book to solve evens-only*
+(define even? 
+    (lambda (n)
+        (= (* (divideby n 2) 2) n)))
+
+;; writing evens-only* 
+(define evens-only*
+ (lambda (lat)
+  (cond
+    ((null? lat) '())
+    ((atom? (car lat)) 
+        (cond ((even? (car lat)) 
+                (cons (car lat) (evens-only* (cdr lat))))
+              (else (evens-only* (cdr lat)))))
+    (else (cons 
+            (evens-only* (car lat))
+            (evens-only* (cdr lat)))))))
+(evens-only* '((9 1 2 8) 3 10 ((9 9) 7 6) 2))
+
+
+(define evens-only*&co
+ (lambda (l col)
+  (cond 
+    ((null? l) 
+        (col '() 1 0))
+    ((atom? (car l))
+      (cond
+        ((even? (car l))
+            (evens-only*&co (cdr l)
+                (lambda (newl p s)
+                    (col (cons (car l) newl)
+                         (* (car l) p) s))))
+        (else (evens-only*&co (car l)
+                (lambda (newl p s)
+                    (col newl p (+ (car l) s)))))) )
+    (else (evens-only*&co (car l)
+            (lambda (al ap as)
+                (evens-only*&co (car l)
+                    (lambda (dl dp ds)
+                        (col (cons al dl)
+                             (* ap dp)
+                             (+ as ds))))))))))
+;; collectors for evens-only*&co
+(define the-last-friend
+    (lambda (newl product sum)
+        (cons sum
+            (cons product newl))))
+; (evens-only*&co '((9 1 2 8) 3 10 ((9 9) 7 6) 2) the-last-friend)
+;; TODO: this func ^^ doesn't work.. and I don't understand it..
