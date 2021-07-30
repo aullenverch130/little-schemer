@@ -458,3 +458,84 @@ multirember-equal?
             (cons product newl))))
 ; (evens-only*&co '((9 1 2 8) 3 10 ((9 9) 7 6) 2) the-last-friend)
 ;; TODO: this func ^^ doesn't work.. and I don't understand it..
+
+
+;; Ch. 8 = 22pg.
+;; Ch. 9 = 25pg.
+
+
+
+
+
+
+;; messing around with currying!!
+(define concat-c3
+    (lambda (fst)
+        (lambda (snd)
+          (lambda (thrd)
+              (string-append fst snd thrd) ))))
+
+(define string-append-c
+    (lambda (fst)  
+        (lambda (snd)
+           (list->string 
+              (append (string->list fst)    
+                      (string->list snd))))))
+; (((concat-c3 "testing") " ") "concat-c3")
+; ((string-append-c "testing ") "string-append-c")
+
+
+;;; TODO: cons it on to the tail.. backwards.. 
+(define appendlist
+  (lambda (l1 l2) 
+      (cond
+        ((null? l2) l1)
+        (else (appendlist (cons (car l2) l1) (cdr l2))))))
+
+(appendlist '(1 2 3) '(4 5))
+
+
+
+
+
+; (plus-c )
+; (times-c )
+
+
+
+
+
+;; LAMBDA CALC EXP
+((lambda (x) x) 'y) ;; id 
+(((lambda (a) (lambda (b) a)) 'x) 'y) ;; true
+(((lambda (a) (lambda (b) b)) 'x) 'y) ;; false
+
+
+(define true 
+   (lambda (a) 
+     (lambda (b) 
+             a)))
+
+(define false
+  (lambda (a) 
+    (lambda (b) 
+            b)))
+
+(define id
+  (lambda (x)
+            x))
+
+((true 'x) 'y)
+((false 'x) 'y)
+(id 'y)
+
+;; example of lambda calc syntax
+;; (((La.Lb.a) x) y) => x
+;; La.Lb.b
+
+
+
+
+
+; "pass by value" vs "pass by reference"
+;                 C++ gives option..

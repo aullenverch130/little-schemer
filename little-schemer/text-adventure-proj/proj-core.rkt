@@ -1,4 +1,6 @@
-#lang racket 
+#lang racket
+
+
 
 ;; from book
 (define atom? 
